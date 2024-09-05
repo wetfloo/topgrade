@@ -403,6 +403,8 @@ pub struct Misc {
 
     run_in_tmux: Option<bool>,
 
+    tmux_force_attach: Option<bool>,
+
     cleanup: Option<bool>,
 
     notify_each_step: Option<bool>,
@@ -709,6 +711,13 @@ pub struct CommandLineArgs {
     /// Run inside tmux
     #[arg(short = 't', long = "tmux")]
     run_in_tmux: bool,
+
+    /// Attach to the newly created tmux session,
+    /// even when the user is currently inside of tmux.
+    ///
+    /// Active only when `run_in_tmux` is also active
+    #[arg(long = "tmux-force-attach")]
+    tmux_force_attach: bool,
 
     /// Cleanup temporary or old files
     #[arg(short = 'c', long = "cleanup")]
@@ -1024,8 +1033,18 @@ impl Config {
         self.config_file.git.as_ref().and_then(|git| git.arguments.as_ref())
     }
 
+    pub fn tmux_config(&self) -> Result<TmuxConfig> {
+        let args = self.tmux_arguments()?;
+        Ok(TmuxConfig {
+            args,
+            extras: TmuxConfigExtras {
+                force_attach: self.opt.tmux_force_attach,
+            },
+        })
+    }
+
     /// Extra Tmux arguments
-    pub fn tmux_arguments(&self) -> Result<Vec<String>> {
+    fn tmux_arguments(&self) -> Result<Vec<String>> {
         let args = &self
             .config_file
             .misc
@@ -1570,6 +1589,15 @@ impl Config {
             .and_then(|lensfun| lensfun.use_sudo)
             .unwrap_or(false)
     }
+}
+
+pub struct TmuxConfig {
+    pub args: Vec<String>,
+    pub extras: TmuxConfigExtras,
+}
+
+pub struct TmuxConfigExtras {
+    pub force_attach: bool,
 }
 
 #[cfg(test)]
