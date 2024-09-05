@@ -976,6 +976,17 @@ impl Config {
                 .unwrap_or(false)
     }
 
+    /// Tell force attach to the newly created session.
+    pub fn tmux_force_attach(&self) -> bool {
+        self.opt.tmux_force_attach
+            || self
+                .config_file
+                .misc
+                .as_ref()
+                .and_then(|misc| misc.tmux_force_attach)
+                .unwrap_or(false)
+    }
+
     /// Tell whether we should perform cleanup steps.
     pub fn cleanup(&self) -> bool {
         self.opt.cleanup
@@ -1038,7 +1049,7 @@ impl Config {
         Ok(TmuxConfig {
             args,
             extras: TmuxConfigExtras {
-                force_attach: self.opt.tmux_force_attach,
+                force_attach: self.tmux_force_attach(),
             },
         })
     }
