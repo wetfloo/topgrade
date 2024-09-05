@@ -47,6 +47,13 @@
 # Run inside tmux (default: false)
 # run_in_tmux = true
 
+# Attach to the newly created tmux session,
+# even when the user is currently inside of tmux.
+#
+# Active only when `run_in_tmux` is also active
+# (default: false)
+# tmux_force_attach = true
+
 # Cleanup temporary or old files (default: false)
 # cleanup = true
 
